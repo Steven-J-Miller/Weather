@@ -9,7 +9,7 @@ from datetime import datetime
 
 
 def get_weather_city(city):
-    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid=297f37e36a2be40a8cb374f3a628a07d'
+    url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&appid=297f37e36a2be40a8cb374f3a628a07d&units=imperial'
     try:
         r = requests.get(url)
         weather_data = r.json()
@@ -20,7 +20,7 @@ def get_weather_city(city):
 
 
 def get_weather_zip(zip_code, key, country='us'):
-    url = f'http://api.openweathermap.org/data/2.5/weather?zip={zip_code},{country}&appid={key}'
+    url = f'http://api.openweathermap.org/data/2.5/weather?zip={zip_code},{country}&appid={key}&units=imperial'
     try:
         r = requests.get(url)
         weather_data = r.json()
@@ -31,7 +31,7 @@ def get_weather_zip(zip_code, key, country='us'):
 
 
 def get_forecast_zip(zip_code, key, country='us'):
-    url = f'http://api.openweathermap.org/data/2.5/forecast?zip={zip_code},{country}&appid={key}'
+    url = f'http://api.openweathermap.org/data/2.5/forecast?zip={zip_code},{country}&appid={key}&units=imperial'
     try:
         r = requests.get(url)
         weather_data = r.json()
@@ -71,20 +71,29 @@ def parse_weather(weather):
 
 def parse_forecast(forecast):
     print(f"Forecast for {forecast['city']['name']}")
-    #TODO: Get unique dates from forecast. Get High and Low Temp by date.
     print('-'*80)
     for row in forecast['list']:
         time = datetime.fromtimestamp(row['dt'])
-        time = datetime.strftime(time, '%a %m/%d %I %p')
-        temp = (row['main']['temp'] - 273.15)*1.8+32
-        print(f"|{time}|{temp:.0f}°|{row['weather'][0]['main']}")
-        #TODO: Add wind speed, cloud cover, rainfall totals to forecst
+        time = datetime.strftime(time, '%a %m/%d | %I:%M %p')
+        time = f"{time:^10}"
 
-parse_forecast(forecast)
+        if len(row['rain']) > 0:
+            rain = row['rain']['3h']
+        else:
+            rain = 0
+        temp = f"{row['main']['temp']:.0f}°"
+        weather_status = row['weather'][0]['main']
+        wind = f"{row['wind']['speed']} mph"
+        print(f"| {time} | {temp} | {weather_status:^9} | {wind:^7} | "
+              f"{row['clouds']['all']}% | {rain:.2f}\" |")
+
 
 key = '297f37e36a2be40a8cb374f3a628a07d'  # temporarily hard-code, to be stored separately
-weather = get_weather_zip(32819,key)
+weather = get_weather_zip(32819, key)
 parse_weather(weather)
+
+forecast = get_forecast_zip(32819, key)
+parse_forecast(forecast)
 """
 Sample Output
 Weather information for London, GB
@@ -96,4 +105,8 @@ Humidity: 81%
 Wind Speed: 4.1 m/s
 Wind Direction: 80°
 Rain (past hour): 1"
+
+--------------------------------------------------------------------------------
+| Date       | Time     | Temp. | Weather | Wind  | Cloud Cover | Rainfall     |
+| Tues 02/26 | 04:00 AM | 48*   | Clear   | 4 m/s |     92%     |     0.02"    |
 """
