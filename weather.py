@@ -80,6 +80,8 @@ def parse_weather(weather):
     if 'rain' in weather.keys():  # gets rainfall total if data exists, otherwise 0
         if len(weather['rain']) > 0:
             rain = weather['rain']['1h']
+        else:
+            rain = '0.00"'
     else:
         rain = 0
 
@@ -113,6 +115,8 @@ def parse_forecast(forecast):
         if 'rain' in row.keys():
             if len(row['rain']) > 0:
                 rain = f"{row['rain']['3h']:.2f}\""
+            else:
+                rain = '0.00"'
         else:
             rain = '0.00"'
         temp = f"{row['main']['temp']:.0f}°"
