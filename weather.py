@@ -91,7 +91,7 @@ def parse_weather(weather):
     print(f'Currently: {desc}\nTemperature: {temp_f:.0f}°F ({temp_c:.0f}°C)')
     print(f'Humidity: {humidity}%')
     print(f"Wind Speed: {weather['wind']['speed']} mph")
-    print(f"Wind Direction: {weather['wind']['deg']}°")
+    print(f"Wind Direction: {weather['wind']['deg']:.0f}°")
     print(f"Rainfall past hour: {rain:.2f}\"")
     print(f"Sunrise: {sunrise}")
     print(f"Sunset: {sunset}")
